@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.blogs.blogwellapp.errorresponse.dtos.ErrorResponse;
+import in.blogs.blogwellapp.security.JWTService;
 import in.blogs.blogwellapp.users.UsersService.InvalidCredentialsException;
 import in.blogs.blogwellapp.users.UsersService.UserNotFoundException;
 import in.blogs.blogwellapp.users.dtos.CreateUserRequest;
-import in.blogs.blogwellapp.users.dtos.CreateUserResponse;
+import in.blogs.blogwellapp.users.dtos.UserResponse;
 import in.blogs.blogwellapp.users.dtos.LoginUserRequest;
 
 @RestController
@@ -23,26 +24,32 @@ import in.blogs.blogwellapp.users.dtos.LoginUserRequest;
 public class UsersController {
 	private final UsersService usersService;
 	private final ModelMapper modelMapper;
+	private final JWTService jwtService;
 	
-	public UsersController(UsersService usersService, ModelMapper modelMapper) {
+	public UsersController(UsersService usersService, ModelMapper modelMapper, JWTService jwtService) {
 		this.usersService = usersService;
 		this.modelMapper = modelMapper;
+		this.jwtService = jwtService;
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<CreateUserResponse> signupUser(@RequestBody CreateUserRequest request) {
+	public ResponseEntity<UserResponse> signupUser(@RequestBody CreateUserRequest request) {
 		UserEntity savedUser = usersService.createUser(request);
 		URI savedURI = URI.create("/users/" + savedUser.getId());
+		UserResponse userResponse = modelMapper.map(savedUser, UserResponse.class);
+		userResponse.setToken( jwtService.createJWT(savedUser.getId()) );
 		
 		return ResponseEntity.created(savedURI)
-				.body(modelMapper.map(savedUser, CreateUserResponse.class));
+				.body(userResponse);
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<CreateUserResponse> loginUser(@RequestBody LoginUserRequest request) {
+	public ResponseEntity<UserResponse> loginUser(@RequestBody LoginUserRequest request) {
 		UserEntity savedUser = usersService.loginUser(request.getUsername(), request.getPassword());
+		UserResponse userResponse = modelMapper.map(savedUser, UserResponse.class);
+		userResponse.setToken( jwtService.createJWT(savedUser.getId()) );
 		
-		return ResponseEntity.ok(modelMapper.map(savedUser, CreateUserResponse.class));
+		return ResponseEntity.ok(userResponse);
 	}
 	
 	@ExceptionHandler({
