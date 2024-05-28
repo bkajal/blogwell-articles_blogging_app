@@ -46,8 +46,12 @@ public class AppSecurityConfig {
     		.csrf(AbstractHttpConfigurer::disable)
     		.cors(CorsConfigurer::disable)
     		.authorizeHttpRequests(auth -> 
-    		auth.requestMatchers(HttpMethod.POST, "/users/signup","/users/login","/articles").permitAll()
+    		auth
+    			.requestMatchers("/users").permitAll()
+    			.requestMatchers(HttpMethod.GET,"/users/*").permitAll()
+    			.requestMatchers(HttpMethod.POST, "/users/signup","/users/login","/articles").permitAll()
     			.requestMatchers(HttpMethod.GET, "/articles", "/articles/*").permitAll()
+    			.requestMatchers(HttpMethod.DELETE,"/users/*").permitAll()
     			.anyRequest().authenticated())
     			.addFilterBefore(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class)
     		.build();

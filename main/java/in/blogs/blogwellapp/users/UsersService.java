@@ -1,10 +1,18 @@
 package in.blogs.blogwellapp.users;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import in.blogs.blogwellapp.exceptions.InvalidCredentialsException;
+import in.blogs.blogwellapp.exceptions.UserNotFoundException;
 import in.blogs.blogwellapp.users.dtos.CreateUserRequest;
+import in.blogs.blogwellapp.users.dtos.UpdateUserRequest;
 
 @Service
 public class UsersService {
@@ -18,10 +26,8 @@ public class UsersService {
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	public UserEntity createUser(CreateUserRequest req) {
-		UserEntity newUser = modelMapper.map(req, UserEntity.class);
-		newUser.setPassword(passwordEncoder.encode(req.getPassword()));
-		return usersRepository.save(newUser);
+	public List<UserEntity> getAllUsers(){
+		return usersRepository.findAll();
 	}
 	
 	public UserEntity getUser(String username) {
@@ -32,29 +38,42 @@ public class UsersService {
 		return usersRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 	}
 	
+	public UserEntity createUser(CreateUserRequest req) {
+		UserEntity newUser = modelMapper.map(req, UserEntity.class);
+		newUser.setPassword(passwordEncoder.encode(req.getPassword()));
+		return usersRepository.save(newUser);
+	}
+	
 	public UserEntity loginUser(String username, String password) {
-		UserEntity user = usersRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+		UserEntity user = getUser(username);
 		boolean passMatch = passwordEncoder.matches(password, user.getPassword());
 		if (!passMatch) throw new InvalidCredentialsException();
 		return user;
 	}
 	
-	public static class UserNotFoundException extends IllegalArgumentException{
+	public UserEntity updateUser(UpdateUserRequest request, long id) {
+		UserEntity foundUser = getUser(id);
 		
-		public UserNotFoundException(String username) {
-			super("User with username : "+ username + " not found");
+		if (request.getUsername() != null) {
+			foundUser.setUsername(request.getUsername());
 		}
-		public UserNotFoundException(Long userId) {
-			super("User with userid : "+ userId + " not found");
+		if (request.getEmail() != null) {
+			foundUser.setEmail(request.getEmail());
 		}
-		
+		if (request.getPassword() != null) {
+			foundUser.setPassword(passwordEncoder.encode(request.getPassword()));
+		}
+		if (request.getBio() != null) {
+			foundUser.setBio(request.getBio());
+		}
+		if (request.getImage() != null) {
+			foundUser.setImage(request.getImage());
+		}
+		return usersRepository.save(foundUser);
 	}
 	
-	public static class InvalidCredentialsException extends IllegalArgumentException{
-
-		public InvalidCredentialsException() {
-			super("Invalid Username and Password Combination");
-		}
-		
+	public void deleteUserById(@PathVariable long id) {
+		usersRepository.deleteById(id);
 	}
+
 }
