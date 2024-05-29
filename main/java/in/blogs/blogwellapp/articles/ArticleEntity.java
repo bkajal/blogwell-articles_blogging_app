@@ -1,10 +1,12 @@
 package in.blogs.blogwellapp.articles;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.lang.Nullable;
 
+import in.blogs.blogwellapp.comments.CommentEntity;
 import in.blogs.blogwellapp.users.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,9 +44,10 @@ public class ArticleEntity {
 	@NonNull
 	private String body;
 	@CreatedDate
-	private Date createdAt;
+	private LocalDate createdAt;
 	@ManyToOne
 	@JoinColumn(name="author_id", nullable = false)
 	private UserEntity author;
-	
+	@OneToMany(mappedBy = "article")
+	private List<CommentEntity> comments;
 }

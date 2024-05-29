@@ -9,7 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 
-	@ExceptionHandler({UserNotFoundException.class, InvalidCredentialsException.class})
+	@ExceptionHandler({UserNotFoundException.class, InvalidCredentialsException.class, ArticleNotFoundException.class})
 	public ResponseEntity<ErrorResponse> handleUserNotFoundException(Exception exception){
 		HttpStatus status;
 		int statusCode;
@@ -26,6 +26,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 			statusCode = HttpStatus.UNAUTHORIZED.value();
 			message = exception.getMessage();
 			error = HttpStatus.UNAUTHORIZED.getReasonPhrase();
+		} else if(exception instanceof ArticleNotFoundException){
+			status = HttpStatus.NOT_FOUND;
+			statusCode = HttpStatus.NOT_FOUND.value();
+			message = exception.getMessage();
+			error = HttpStatus.NOT_FOUND.getReasonPhrase();
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 			statusCode = HttpStatus.BAD_REQUEST.value();

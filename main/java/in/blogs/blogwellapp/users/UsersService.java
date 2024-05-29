@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import in.blogs.blogwellapp.articles.ArticleEntity;
 import in.blogs.blogwellapp.exceptions.InvalidCredentialsException;
 import in.blogs.blogwellapp.exceptions.UserNotFoundException;
 import in.blogs.blogwellapp.users.dtos.CreateUserRequest;
@@ -68,6 +69,11 @@ public class UsersService {
 		}
 		if (request.getImage() != null) {
 			foundUser.setImage(request.getImage());
+		}
+		
+		List<ArticleEntity> articles = foundUser.getArticles();
+		for (ArticleEntity article : articles) {
+			article.setAuthor(foundUser);
 		}
 		return usersRepository.save(foundUser);
 	}

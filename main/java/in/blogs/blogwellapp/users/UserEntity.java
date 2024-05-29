@@ -1,13 +1,18 @@
 package in.blogs.blogwellapp.users;
 
 
+import java.util.List;
+
 import org.springframework.lang.Nullable;
 
+import in.blogs.blogwellapp.articles.ArticleEntity;
+import in.blogs.blogwellapp.comments.CommentEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,4 +48,8 @@ public class UserEntity {
 	@Column(nullable = true)
 	@Nullable
 	private String image;
+	@OneToMany(mappedBy = "author")
+	List<ArticleEntity> articles;
+	@OneToMany(mappedBy = "author")
+	List<CommentEntity> comments;
 }

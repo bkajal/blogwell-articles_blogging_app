@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import in.blogs.blogwellapp.articles.ArticleEntity;
+import in.blogs.blogwellapp.articles.ArticlesService;
 import in.blogs.blogwellapp.security.JWTService;
 import in.blogs.blogwellapp.users.dtos.CreateUserRequest;
 import in.blogs.blogwellapp.users.dtos.UserResponse;
@@ -26,21 +28,23 @@ import in.blogs.blogwellapp.users.dtos.UpdateUserRequest;
 @RequestMapping("/users")
 public class UsersController {
 	private final UsersService usersService;
+	private final ArticlesService articlesService;
 	private final ModelMapper modelMapper;
 	private final JWTService jwtService;
 	
-	public UsersController(UsersService usersService, ModelMapper modelMapper, JWTService jwtService) {
+	public UsersController(UsersService usersService, ArticlesService articlesService, ModelMapper modelMapper, JWTService jwtService) {
 		this.usersService = usersService;
+		this.articlesService = articlesService;
 		this.modelMapper = modelMapper;
 		this.jwtService = jwtService;
 	}
-	
+
 	private UserResponse userResponse;
 	
 	@GetMapping("")
-	public ResponseEntity<ArrayList<UserResponse>> getAllUsers() {
+	public ResponseEntity<List<UserResponse>> getAllUsers() {
 		List<UserEntity> userslist = usersService.getAllUsers();
-		ArrayList<UserResponse> userResponselist = new ArrayList();
+		List<UserResponse> userResponselist = new ArrayList();
 		
 		for (UserEntity user : userslist) {
 			userResponse = modelMapper.map(user, UserResponse.class);
@@ -57,6 +61,18 @@ public class UsersController {
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponse> getUserById(@PathVariable long id) {
 		UserEntity user = usersService.getUser(id);
+		
+		userResponse = modelMapper.map(user, UserResponse.class);
+		userResponse.setToken(null);
+		userResponse.setStatusCode(HttpStatus.OK.value());
+		userResponse.setMessage("success");
+		
+		return ResponseEntity.ok(userResponse);
+	}
+	
+	@GetMapping("/user/{username}")
+	public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
+		UserEntity user = usersService.getUser(username);
 		
 		userResponse = modelMapper.map(user, UserResponse.class);
 		userResponse.setToken(null);
@@ -107,6 +123,12 @@ public class UsersController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<UserResponse> deleteUserById(@PathVariable long id) {
 		UserEntity foundUser = usersService.getUser(id);
+		//delete mapping with articles
+		List<ArticleEntity> articles = foundUser.getArticles();
+		for (ArticleEntity article : articles) {
+			articlesService.deleteArticleById(article.getId());
+		}
+		//delete user
 		usersService.deleteUserById(foundUser.getId());
 		
 		userResponse = modelMapper.map(foundUser, UserResponse.class);
@@ -116,6 +138,4 @@ public class UsersController {
 		
 		return ResponseEntity.ok(userResponse);
 	}
-	
-	
 }
