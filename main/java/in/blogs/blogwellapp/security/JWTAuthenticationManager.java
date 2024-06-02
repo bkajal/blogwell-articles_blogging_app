@@ -1,11 +1,8 @@
 package in.blogs.blogwellapp.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import in.blogs.blogwellapp.users.UserEntity;
 import in.blogs.blogwellapp.users.UsersService;
 

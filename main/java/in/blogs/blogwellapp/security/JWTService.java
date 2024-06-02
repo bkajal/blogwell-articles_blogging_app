@@ -20,7 +20,7 @@ public class JWTService {
 		
 		return JWT.create()
 			.withSubject(userId.toString())
-			.withIssuedAt(new Date())
+			.withIssuedAt(new Date(System.currentTimeMillis()))
 			.withExpiresAt(new Date(System.currentTimeMillis()+5000L))
 			.sign(algorithm);
 	}

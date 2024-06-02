@@ -1,9 +1,8 @@
 package in.blogs.blogwellapp.comments;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.lang.Nullable;
 
 import in.blogs.blogwellapp.articles.ArticleEntity;
 import in.blogs.blogwellapp.users.UserEntity;
@@ -32,23 +31,14 @@ public class CommentEntity {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	@Column(nullable = false)
 	private long id;
-	@Nullable
-	private String title;
 	@NonNull
-	private String body;
+	private String comment;
 	@CreatedDate
-	private Date createdAt;
+	private LocalDate createdAt;
 	@ManyToOne
 	@JoinColumn(name="article_id", nullable = false)
 	private ArticleEntity article;
 	@ManyToOne
 	@JoinColumn(name="author_id", nullable = false)
 	private UserEntity author;
-
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return super.toString();
-	}
-	
 }
