@@ -7,6 +7,8 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import in.blogs.blogwellapp.articles.ArticleEntity;
 import in.blogs.blogwellapp.articles.ArticlesService;
+import in.blogs.blogwellapp.security.JWTAuthentication;
 import in.blogs.blogwellapp.security.JWTService;
 import in.blogs.blogwellapp.users.dtos.CreateUserRequest;
 import in.blogs.blogwellapp.users.dtos.UserResponse;
@@ -45,10 +48,12 @@ public class UsersController {
 	public ResponseEntity<List<UserResponse>> getAllUsers() {
 		List<UserEntity> userslist = usersService.getAllUsers();
 		List<UserResponse> userResponselist = new ArrayList();
+		JWTAuthentication jwtAuthentication = (JWTAuthentication) SecurityContextHolder.getContext().getAuthentication();
+		String jwt = jwtAuthentication.getCredentials();
 		
 		for (UserEntity user : userslist) {
 			userResponse = modelMapper.map(user, UserResponse.class);
-			userResponse.setToken(null);
+			userResponse.setToken(jwt);
 			userResponse.setStatusCode(HttpStatus.OK.value());
 			userResponse.setMessage("success");
 			userResponselist.add(userResponse);
@@ -61,9 +66,11 @@ public class UsersController {
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponse> getUserById(@PathVariable long id) {
 		UserEntity user = usersService.getUser(id);
+		JWTAuthentication jwtAuthentication = (JWTAuthentication) SecurityContextHolder.getContext().getAuthentication();
+		String jwt = jwtAuthentication.getCredentials();
 		
 		userResponse = modelMapper.map(user, UserResponse.class);
-		userResponse.setToken(null);
+		userResponse.setToken(jwt);
 		userResponse.setStatusCode(HttpStatus.OK.value());
 		userResponse.setMessage("success");
 		
@@ -73,9 +80,11 @@ public class UsersController {
 	@GetMapping("/user/{username}")
 	public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
 		UserEntity user = usersService.getUser(username);
+		JWTAuthentication jwtAuthentication = (JWTAuthentication) SecurityContextHolder.getContext().getAuthentication();
+		String jwt = jwtAuthentication.getCredentials();
 		
 		userResponse = modelMapper.map(user, UserResponse.class);
-		userResponse.setToken(null);
+		userResponse.setToken(jwt);
 		userResponse.setStatusCode(HttpStatus.OK.value());
 		userResponse.setMessage("success");
 		
@@ -99,9 +108,11 @@ public class UsersController {
 	@PostMapping("/login")
 	public ResponseEntity<UserResponse> loginUser(@RequestBody LoginUserRequest request) {
 		UserEntity savedUser = usersService.loginUser(request.getUsername(), request.getPassword());
+		JWTAuthentication jwtAuthentication = (JWTAuthentication) SecurityContextHolder.getContext().getAuthentication();
+		String jwt = jwtAuthentication.getCredentials();
 		
 		userResponse = modelMapper.map(savedUser, UserResponse.class);
-		userResponse.setToken( jwtService.createJWT(savedUser.getId()) );
+		userResponse.setToken( jwt );
 		userResponse.setStatusCode(HttpStatus.OK.value());
 		userResponse.setMessage("login successfull");
 		
@@ -111,9 +122,11 @@ public class UsersController {
 	@PutMapping("/{id}")
 	public ResponseEntity<UserResponse> updateUser(@RequestBody UpdateUserRequest request, @PathVariable long id) {
 		UserEntity updateUser = usersService.updateUser(request, id);
+		JWTAuthentication jwtAuthentication = (JWTAuthentication) SecurityContextHolder.getContext().getAuthentication();
+		String jwt = jwtAuthentication.getCredentials();
 		
 		userResponse = modelMapper.map(updateUser, UserResponse.class);
-		userResponse.setToken(null);
+		userResponse.setToken(jwt);
 		userResponse.setStatusCode(HttpStatus.OK.value());
 		userResponse.setMessage("update successfull");
 		

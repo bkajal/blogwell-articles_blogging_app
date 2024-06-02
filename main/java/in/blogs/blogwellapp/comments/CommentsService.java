@@ -11,6 +11,7 @@ import in.blogs.blogwellapp.articles.ArticleEntity;
 import in.blogs.blogwellapp.articles.ArticlesService;
 import in.blogs.blogwellapp.comments.dtos.CreateCommentRequest;
 import in.blogs.blogwellapp.exceptions.CommentNotFoundException;
+import in.blogs.blogwellapp.security.JWTAuthentication;
 import in.blogs.blogwellapp.users.UserEntity;
 
 @Service
@@ -38,7 +39,8 @@ public class CommentsService {
 	
 	public CommentEntity createComment(CreateCommentRequest req, long id) {
 		ArticleEntity article = articlesService.getArticleById(id);
-		UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		JWTAuthentication jwtAuthentication = (JWTAuthentication) SecurityContextHolder.getContext().getAuthentication();
+		UserEntity user = jwtAuthentication.getPrincipal();
 	/*	CommentEntity comment = CommentEntity.builder()
 			.comment(req.getComment())
 			.createdAt(LocalDate.now())
