@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home Page</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var countdownElement = document.getElementById('countdown');
+            var countdownTime = 5; 
+
+            countdownElement.textContent = countdownTime; 
+
+            var countdownInterval = setInterval(function() {
+                countdownTime--; 
+                countdownElement.textContent = countdownTime; 
+
+                if (countdownTime <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = '/swagger-ui/index.html'; 
+                }
+            }, 2000);
+        });
+    </script>
+
+    <style>
+        body {
+            text-align: center;
+            margin-top: 100px;
+            font-family: Arial, sans-serif;
+            background-color: #72e6cf;
+        }
+        p{
+        	font-size : 20px;
+        }
+        span{
+        	font-size : 30px;
+        }
+    </style>
+</head>
+<body>
+	<h1>WELCOME TO MY SPRINGBOOT BLOGWELL APP BACKEND!</h1>
+	<p>Moving to the API test page... <br> <span id="countdown"></span></p>
+</body>
+</html>

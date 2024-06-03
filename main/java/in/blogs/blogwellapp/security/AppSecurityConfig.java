@@ -40,7 +40,8 @@ public class AppSecurityConfig {
     		.cors(CorsConfigurer::disable)
     		.authorizeHttpRequests(auth -> 
     		auth
-    		    .requestMatchers("/").permitAll()
+    		    .requestMatchers("/**").permitAll()
+    		    .requestMatchers("/swagger-ui/**").permitAll()
     		    .requestMatchers("/index.html").permitAll()
     			.requestMatchers("/users").permitAll()
     			.requestMatchers(HttpMethod.GET,"/users/*").permitAll()
